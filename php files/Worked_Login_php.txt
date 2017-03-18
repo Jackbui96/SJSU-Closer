@@ -1,0 +1,33 @@
+<?php
+
+	require_once('db_config.php');
+
+	$con = mysqli_connect(DB_SERVER, DB_USER, DB_PASSWORD, DB_DATABASE);
+
+	if (mysqli_connect_errno()) {
+		echo("Can't connect");
+		exit;
+	}
+	
+	
+	$query = "SELECT * FROM userinfo";
+	$r = mysqli_query($con, $query);
+	$result = array();
+	
+	while($row = mysqli_fetch_array($r)){
+		if(password_verif
+		array_push($result,array(
+			"firstName" => $row["firstName"],
+			"lastName" => $row["lastName"],
+			"accountName" => $row["accountName"],
+			"password" => $row["password"]
+		));
+		
+	}
+	
+	echo json_encode($result);
+	
+	//close connection 
+	mysqli_close($con);
+	
+?>
