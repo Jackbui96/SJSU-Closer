@@ -33,7 +33,7 @@ public class ActivitySendPushNotification extends AppCompatActivity implements V
     //private Spinner spinner;
     private ProgressDialog progressDialog;
 
-    private EditText editTextTitle, editTextMessage, editTextImage, editTextRecieverEmail;
+    private EditText editTextTitle, editTextMessage, editTextImage, editTextReceiverEmail;
 
     private boolean isSendAllChecked;
     private List<String> devices;
@@ -51,7 +51,7 @@ public class ActivitySendPushNotification extends AppCompatActivity implements V
         editTextTitle = (EditText) findViewById(R.id.etTitle);
         editTextMessage = (EditText) findViewById(R.id.etMsg);
         editTextImage = (EditText) findViewById(R.id.etImg);
-        editTextRecieverEmail = (EditText) findViewById(R.id.etReceiverEmail);
+        editTextReceiverEmail = (EditText) findViewById(R.id.etReceiverEmail);
 
         //devices = new ArrayList<>();
 
@@ -84,7 +84,7 @@ public class ActivitySendPushNotification extends AppCompatActivity implements V
         final String title = editTextTitle.getText().toString();
         final String message = editTextMessage.getText().toString();
         final String image = editTextImage.getText().toString();
-        final String email = editTextRecieverEmail.getText().toString();
+        final String email = editTextReceiverEmail.getText().toString();
 
         progressDialog.setMessage("Sending Push");
         progressDialog.show();

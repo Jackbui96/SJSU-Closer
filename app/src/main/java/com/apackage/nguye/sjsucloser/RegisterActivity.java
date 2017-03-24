@@ -36,7 +36,7 @@ public class RegisterActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
     private DatabaseReference mFirebaseDatabase;
-    private FirebaseDatabase mFirebaseInstance;
+    //private FirebaseDatabase mFirebaseInstance;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,7 +51,9 @@ public class RegisterActivity extends AppCompatActivity {
         bRegister = (Button) findViewById(R.id.bRegister);
         progressDialog = new ProgressDialog(RegisterActivity.this);
 
-        mFirebaseInstance = FirebaseDatabase.getInstance();
+        mFirebaseDatabase = FirebaseDatabase.getInstance().getReference();
+        mAuth = FirebaseAuth.getInstance();
+        //mFirebaseDatabase = mFirebaseInstance.getReference("users");
 
         bRegister.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -63,7 +65,7 @@ public class RegisterActivity extends AppCompatActivity {
             }
         });
 
-        mAuth = FirebaseAuth.getInstance();
+
         mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
@@ -121,6 +123,7 @@ public class RegisterActivity extends AppCompatActivity {
                                     Toast.LENGTH_SHORT).show();
                             progressDialog.dismiss();
                         } else {
+                            onAuthSucess(task.getResult().getUser());
                             Toast.makeText(RegisterActivity.this, "Register Successful", Toast.LENGTH_SHORT).show();
                             progressDialog.dismiss();
                             Intent loginIntent = new Intent(RegisterActivity.this, LoginActivity.class);
@@ -154,11 +157,9 @@ public class RegisterActivity extends AppCompatActivity {
         usr.setPassword(password);
     }
 
-    /*
-    private void onAuthenticationSucess(FirebaseUser mUser) {
+    private void onAuthSucess(FirebaseUser mUser) {
         // Write new user
         saveNewUser(mUser.getUid(), usr.getFirstName(), usr.getLastName(), usr.getAccount(), usr.getPassword());
-        signOut();
         // Go to LoginActivity
         startActivity(new Intent(RegisterActivity.this, LoginActivity.class));
         finish();
@@ -166,15 +167,7 @@ public class RegisterActivity extends AppCompatActivity {
 
     private void saveNewUser(String userId, String firstName, String lastName, String account, String password) {
         usr = new UsrPOJO(userId,firstName,lastName,account,password);
-
-        mRef.child("users").child(userId).setValue(usr);
+        mFirebaseDatabase.child("users").child(userId).setValue(usr);
     }
-
-    private void signOut() {
-        mAuth.signOut();
-    }
-
-
-    */
 
 }
