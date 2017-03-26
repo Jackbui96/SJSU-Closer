@@ -21,9 +21,9 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
-public class RegisterActivity extends AppCompatActivity {
+public class RegisterActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private static final String TAG = "EmailPassword";
+    private static final String TAG = "RegisterActivity";
 
     private UsrPOJO usr;
     private EditText etFirstName;
@@ -34,9 +34,7 @@ public class RegisterActivity extends AppCompatActivity {
     private ProgressDialog progressDialog;
 
     private FirebaseAuth mAuth;
-    private FirebaseAuth.AuthStateListener mAuthListener;
     private DatabaseReference mFirebaseDatabase;
-    //private FirebaseDatabase mFirebaseInstance;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,90 +51,66 @@ public class RegisterActivity extends AppCompatActivity {
 
         mFirebaseDatabase = FirebaseDatabase.getInstance().getReference();
         mAuth = FirebaseAuth.getInstance();
-        //mFirebaseDatabase = mFirebaseInstance.getReference("users");
 
-        bRegister.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                registerUsr(
-                        etAccount.getText().toString().trim(),
-                        etPassword.getText().toString().trim(),
-                        etFirstName.getText().toString().trim(),
-                        etLastName.getText().toString().trim());
-            }
-        });
+        bRegister.setOnClickListener(this);
 
-
-        mAuthListener = new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                FirebaseUser user = firebaseAuth.getCurrentUser();
-                if (user != null) {
-                    // User is signed in
-                    Log.d(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
-
-                } else {
-                    // User is signed out
-                    Log.d(TAG, "onAuthStateChanged:signed_out");
-                }
-            }
-        };
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        mAuth.addAuthStateListener(mAuthListener);
-    }
+    private void register() {
 
-    @Override
-    public void onStop() {
-        super.onStop();
-        if (mAuthListener != null) {
-            mAuth.removeAuthStateListener(mAuthListener);
-        }
-    }
+        String firstName = etFirstName.getText().toString();
+        String lastName = etLastName.getText().toString();
+        String account = etAccount.getText().toString();
+        String password = etPassword.getText().toString();
 
-    private void registerUsr(String email, String password, String firstName, String lastName) {
-
-        Log.d(TAG, "createNewAccount:" + email);
-        if (!validateForm(email, password, firstName, lastName)) {
+        Log.d(TAG, "createNewAccount:" + account);
+        if (!validateForm(account, password, firstName, lastName)) {
             return;
         }
-
-        //This method sets up a new User by fetching the user entered details.
-        //setUpUsr(email, password, firstName, lastName);
 
         progressDialog.setMessage("Registering Please Wait...");
         progressDialog.show();
 
-        mAuth.createUserWithEmailAndPassword(email, password)
+        mAuth.createUserWithEmailAndPassword(account, password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
-                        Log.d(TAG, "createUserWithEmail:onComplete:" + task.isSuccessful());
+                        Log.d(TAG, "createUser:onComplete:" + task.isSuccessful());
 
-                        // If sign in fails, display a message to the user. If sign in succeeds
-                        // the auth state listener will be notified and logic to handle the
-                        // signed in user can be handled in the listener.
-                        if (!task.isSuccessful()) {
-                            Toast.makeText(RegisterActivity.this, "Failed to register",
+                        if (task.isSuccessful()) {
+                            onAuthSucess(task.getResult().getUser());
+                        } else {
+                            Toast.makeText(RegisterActivity.this, "Sign Up Failed",
                                     Toast.LENGTH_SHORT).show();
                             progressDialog.dismiss();
-                        } else {
-                            onAuthSucess(task.getResult().getUser());
-                            Toast.makeText(RegisterActivity.this, "Register Successful", Toast.LENGTH_SHORT).show();
-                            progressDialog.dismiss();
-                            Intent loginIntent = new Intent(RegisterActivity.this, LoginActivity.class);
-                            RegisterActivity.this.startActivity(loginIntent);
                         }
                     }
                 });
 
     }
 
+    private void onAuthSucess(FirebaseUser mUser) {
+        // Write new user
+        saveNewUser(
+                mUser.getUid(),
+                etFirstName.getText().toString(),
+                etLastName.getText().toString(),
+                etAccount.getText().toString(),
+                etPassword.getText().toString());
+        // Go to LoginActivity
+        startActivity(new Intent(RegisterActivity.this, LoginActivity.class));
+        Toast.makeText(RegisterActivity.this, "Register Successful", Toast.LENGTH_SHORT).show();
+        progressDialog.dismiss();
+        finish();
+    }
+
+    private void saveNewUser(String userId, String firstName, String lastName, String account, String password) {
+        usr = new UsrPOJO(userId,firstName,lastName,account,password);
+        mFirebaseDatabase.child("users").child(userId).setValue(usr);
+    }
+
     private boolean validateForm(String email, String password, String firstName, String lastName) {
         boolean valid = true;
-
         if (TextUtils.isEmpty(email) || TextUtils.isEmpty(password) || TextUtils.isEmpty(firstName) || TextUtils.isEmpty(lastName)) {
             AlertDialog.Builder builder = new AlertDialog.Builder(RegisterActivity.this);
             builder.setMessage("Please enter all fields")
@@ -145,29 +119,14 @@ public class RegisterActivity extends AppCompatActivity {
                     .show();
             valid = false;
         }
-
         return valid;
     }
 
-    protected void setUpUsr(String email, String password, String firstName, String lastName) {
-        usr = new UsrPOJO();
-        usr.setFirstName(firstName);
-        usr.setLastName(lastName);
-        usr.setAccount(email);
-        usr.setPassword(password);
-    }
-
-    private void onAuthSucess(FirebaseUser mUser) {
-        // Write new user
-        saveNewUser(mUser.getUid(), usr.getFirstName(), usr.getLastName(), usr.getAccount(), usr.getPassword());
-        // Go to LoginActivity
-        startActivity(new Intent(RegisterActivity.this, LoginActivity.class));
-        finish();
-    }
-
-    private void saveNewUser(String userId, String firstName, String lastName, String account, String password) {
-        usr = new UsrPOJO(userId,firstName,lastName,account,password);
-        mFirebaseDatabase.child("users").child(userId).setValue(usr);
+    @Override
+    public void onClick(View v) {
+        int i = v.getId();
+        if (i == R.id.bRegister)
+            register();
     }
 
 }
