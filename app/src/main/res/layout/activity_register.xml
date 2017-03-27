@@ -63,7 +63,7 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
-        android:text="First name"
+        android:text="First name:"
         android:textSize="20sp"
         android:textStyle="normal|bold" />
 

@@ -109,9 +109,9 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         mFirebaseDatabase.child("users").child(userId).setValue(usr);
     }
 
-    private boolean validateForm(String email, String password, String firstName, String lastName) {
+    private boolean validateForm(String account, String password, String firstName, String lastName) {
         boolean valid = true;
-        if (TextUtils.isEmpty(email) || TextUtils.isEmpty(password) || TextUtils.isEmpty(firstName) || TextUtils.isEmpty(lastName)) {
+        if (TextUtils.isEmpty(account) || TextUtils.isEmpty(password) || TextUtils.isEmpty(firstName) || TextUtils.isEmpty(lastName)) {
             AlertDialog.Builder builder = new AlertDialog.Builder(RegisterActivity.this);
             builder.setMessage("Please enter all fields")
                     .setNegativeButton("Retry", null)

@@ -47,7 +47,7 @@
         android:layout_alignParentStart="true"
         android:layout_below="@+id/etUserAccount"
         android:fontFamily="sans-serif"
-        android:text="Enter your user password:"
+        android:text="Enter your password:"
         android:textSize="20sp"
         android:textStyle="normal|bold" />
 
@@ -59,11 +59,10 @@
         android:layout_alignParentStart="true"
         android:layout_below="@+id/etUserPassword"
         android:elevation="0dp"
-        android:fontFamily="sans-serif"
         android:text="Login" />
 
     <Button
-        android:id="@+id/bRegisterAccount"
+        android:id="@+id/bRegister"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
@@ -75,9 +74,9 @@
         android:id="@+id/tvUserRegister"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/bRegisterAccount"
+        android:layout_above="@+id/bRegister"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="13dp"
+        android:layout_marginBottom="14dp"
         android:text="New to SJSU Closer?"
         android:textSize="20sp" />
 

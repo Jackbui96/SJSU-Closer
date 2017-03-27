@@ -3,115 +3,125 @@ package com.apackage.nguye.sjsucloser;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.toolbox.Volley;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
 
-import org.json.JSONException;
-import org.json.JSONObject;
+public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
 
-public class LoginActivity extends AppCompatActivity {
+    private static final String TAG = "LoginActivity";
+
+    private FirebaseAuth mAuth;
+
+    private EditText usrAccount;
+    private EditText usrPassword;
+    private TextView tvToken;
+    private Button bLogin;
+    private Button bRegister;
+    private Button bToken;
+    private ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
+        usrAccount = (EditText) findViewById(R.id.etUserAccount);
+        usrPassword = (EditText) findViewById(R.id.etUserPassword);
+        tvToken = (TextView) findViewById(R.id.tvToken);
+        bToken = (Button) findViewById(R.id.bDisplayToken);
+        bLogin = (Button) findViewById(R.id.bLogin);
+        bRegister = (Button) findViewById(R.id.bRegister);
+        progressDialog = new ProgressDialog(LoginActivity.this);
 
-        final EditText userAccount = (EditText) findViewById(R.id.etUserAccount);
-        final EditText userPassword = (EditText) findViewById(R.id.etUserPassword);
-        final Button loginButton = (Button) findViewById(R.id.bLogin);
-        final Button registerButton = (Button) findViewById(R.id.bRegisterAccount);
+        mAuth = FirebaseAuth.getInstance();
 
-        final Button bDisplayToken = (Button) findViewById(R.id.bDisplayToken);
-        final TextView tvToken = (TextView) findViewById(R.id.tvToken);
+        bToken.setOnClickListener(this);
+        bLogin.setOnClickListener(this);
+        bRegister.setOnClickListener(this);
+    }
 
-        bDisplayToken.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                if (v == bDisplayToken) {
-                    //getting token from shared preferences
-                    String token = SharedPrefManager.getInstance(LoginActivity.this).getDeviceToken();
+    private void displayToken() {
+        String token = SharedPrefManager.getInstance(LoginActivity.this).getDeviceToken();
 
-                    //if token is not null
-                    if (token != null) {
-                        //displaying the token
-                        tvToken.setText(token);
-                    } else {
-                        //if token is null that means something wrong
-                        tvToken.setText("Token not generated");
-                    }
-                }
-            }
-        });
+        if (token != null) {
+            tvToken.setText(token);
+        } else {
+            tvToken.setText("Token not generated, something is wrong");
+        }
+    }
 
-        registerButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                Intent registerIntent = new Intent(LoginActivity.this, RegisterActivity.class);
-                LoginActivity.this.startActivity(registerIntent);
-            }
-        });
+    private void login() {
 
-        loginButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
+        String account = usrAccount.getText().toString();
+        String password = usrPassword.getText().toString();
 
-                final String account = userAccount.getText().toString();
-                System.out.println(account);
-                final String password = userPassword.getText().toString();
-                System.out.println(password);
+        Log.d(TAG, "Signing in");
+        if (!validateForm(account, password)) {
+            return;
+        }
 
-                final ProgressDialog progressDialog = new ProgressDialog(LoginActivity.this);
-                progressDialog.setMessage("Logging in...");
-                progressDialog.show();
-
-                Response.Listener<String> responseListener = new Response.Listener<String>() {
+        progressDialog.setMessage("Logging in...");
+        progressDialog.show();
+        mAuth.signInWithEmailAndPassword(account, password)
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
-                    public void onResponse(String response) {
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        Log.d(TAG, "signIn:onComplete:" + task.isComplete());
 
-                        System.out.println(response);
-
-                        try {
-                            JSONObject result = new JSONObject(response);
-                            boolean hit = result.getBoolean("hit");
-                            if (hit) {
-                                String firstName = result.getString("firstName");
-                                String lastName = result.getString("lastName");
-                                String account = result.getString("accountName");
-                                Intent intent = new Intent(LoginActivity.this, UserMainActivity.class);
-                                intent.putExtra("firstName", firstName);
-                                intent.putExtra("lastName", lastName);
-                                intent.putExtra("account", account);
-                                LoginActivity.this.startActivity(intent);
-                                progressDialog.dismiss();
-                                Toast.makeText(LoginActivity.this, "Welcome", Toast.LENGTH_SHORT).show();
-                            } else {
-                                progressDialog.dismiss();
-                                AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
-                                builder.setMessage("Login Failed")
-                                        .setNegativeButton("Retry", null)
-                                        .create()
-                                        .show();
-                            }
-
-
-                        } catch (JSONException e) {
-                            e.printStackTrace();
+                        if (task.isSuccessful()) {
+                            Intent usrMainIntent = new Intent(LoginActivity.this, UserMainActivity.class);
+                            LoginActivity.this.startActivity(usrMainIntent);
+                            progressDialog.dismiss();
+                        } else {
+                            Toast.makeText(LoginActivity.this, "Sign In Failed",
+                                    Toast.LENGTH_SHORT).show();
+                            progressDialog.dismiss();
                         }
                     }
-                };
+                });
+    }
 
-                LoginRequest loginRequest = new LoginRequest(account, password, responseListener);
-                RequestQueue requestQueue = Volley.newRequestQueue(LoginActivity.this);
-                requestQueue.add(loginRequest);
-            }
-        });
+    private void register() {
+        Intent registerIntent = new Intent(LoginActivity.this, RegisterActivity.class);
+        LoginActivity.this.startActivity(registerIntent);
+    }
+
+    private boolean validateForm(String account, String password) {
+        boolean valid = true;
+        if (TextUtils.isEmpty(account) || TextUtils.isEmpty(password)) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
+            builder.setMessage("Please enter all fields")
+                    .setNegativeButton("Retry", null)
+                    .create()
+                    .show();
+            valid = false;
+        }
+        return valid;
+    }
+
+    @Override
+    public void onClick(View v) {
+        int i = v.getId();
+        if (i == R.id.bDisplayToken)
+            displayToken();
+        else if (i == R.id.bRegister)
+            register();
+        else if (i == R.id.bLogin)
+            login();
     }
 
 }
