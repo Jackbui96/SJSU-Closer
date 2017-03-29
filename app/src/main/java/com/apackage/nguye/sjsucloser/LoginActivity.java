@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -40,7 +39,12 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        Toolbar loginToolbar = (Toolbar) findViewById(R.id.toolbar);
+        /*
+        ConstraintLayout rl = (ConstraintLayout)findViewById(R.id.activity_login);
+        ImageView imageView = new ImageView(this);
+        imageView.setImageResource(R.drawable.sjsu_logo);
+        rl.addView(imageView);
+        */
 
         usrAccount = (EditText) findViewById(R.id.etUserAccount);
         usrPassword = (EditText) findViewById(R.id.etUserPassword);
