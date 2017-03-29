@@ -25,6 +25,9 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
 
     private static final String TAG = "RegisterActivity";
 
+    private FirebaseAuth mAuth;
+    private DatabaseReference mFirebaseDatabase;
+
     private UsrPOJO usr;
     private EditText etFirstName;
     private EditText etLastName;
@@ -32,9 +35,6 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     private EditText etPassword;
     private Button bRegister;
     private ProgressDialog progressDialog;
-
-    private FirebaseAuth mAuth;
-    private DatabaseReference mFirebaseDatabase;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

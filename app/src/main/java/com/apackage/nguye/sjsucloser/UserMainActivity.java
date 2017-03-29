@@ -1,46 +1,86 @@
 package com.apackage.nguye.sjsucloser;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.ActionMenuView;
+import android.support.v7.widget.Toolbar;
+import android.util.Log;
+import android.view.Menu;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.toolbox.Volley;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-
-import java.util.ArrayList;
-import java.util.List;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 
-public class UserMainActivity extends AppCompatActivity implements OnItemSelectedListener {
+public class UserMainActivity extends AppCompatActivity implements OnItemSelectedListener, View.OnClickListener {
+
+    private static final String TAG = "UserMainActivity";
+
+    private Toolbar toolbar;
+    private ActionMenuView userMenu;
+    private TextView tvWelcome;
+    private TextView tvBasicInfo;
+    private Spinner spinner;
+    private ListView listView;
+    private Button bSubmit;
+
+    private FirebaseUser user;
+    private DatabaseReference mFirebaseDatabase;
+    private ValueEventListener dbListener;
+    private String mUserKey;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_main);
 
-        Intent intent = getIntent();
-        final TextView tvWelcome = (TextView) findViewById(R.id.tvWelcome);
-        final Spinner spinner = (Spinner) findViewById(R.id.optionSpinner);
-        final ListView listView = (ListView) findViewById(R.id.lvFriendList);
-        final Button submitButton = (Button) findViewById(R.id.bSubmit);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setNavigationIcon(R.drawable.ic_menu_drop_down);
+        setSupportActionBar(toolbar);
+        //getSupportActionBar().setIcon(R.drawable.ic_menu_drop_down);
 
-        final String usrFirstName = intent.getStringExtra("firstName");
-        final String usrLastName = intent.getStringExtra("lastName");
-        final String usrAccount = intent.getStringExtra("account");
+        tvWelcome = (TextView) findViewById(R.id.tvWelcome);
+        tvBasicInfo = (TextView) findViewById(R.id.tvBasicInfo);
+        //spinner = (Spinner) findViewById(R.id.optionSpinner);
+        //listView = (ListView) findViewById(R.id.lvFriendList);
+        //bSubmit = (Button) findViewById(R.id.bSubmit);
 
+        user = FirebaseAuth.getInstance().getCurrentUser();
+        mFirebaseDatabase = FirebaseDatabase.getInstance().getReference().child("users").child(user.getUid());
+        dbListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                UsrPOJO user = dataSnapshot.getValue(UsrPOJO.class);
+
+                //Adding it to a string
+                String welcomeMessage = "Welcome back, " + user.getFirstName() + " " + user.getLastName();
+                String basicInfo = "Here is your profile\nYour account: " + user.getAccount() + "\nYour name: " + user.getFirstName() + " " + user.getLastName();
+
+                //Displaying it on textview
+                tvWelcome.setText(welcomeMessage);
+                tvBasicInfo.setText(basicInfo);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.w(TAG, "Failed to read value.", databaseError.toException());
+            }
+        };
+        mFirebaseDatabase.addValueEventListener(dbListener);
+
+        /*
         spinner.setOnItemSelectedListener(this);
         List<String> option = new ArrayList<String>();
         option.add("Add Friend");
@@ -48,8 +88,7 @@ public class UserMainActivity extends AppCompatActivity implements OnItemSelecte
         option.add("Match Class");
         option.add("Send Email");
 
-        String welcomeMessage = "Welcome, " + usrFirstName + usrLastName + "\nHere is your profile"
-                + "\nYour current account: " + usrAccount + "\nFirst Name: " + usrFirstName + "\nLast Name: " + usrLastName;
+        String welcomeMessage = "Welcome back, " + usrFirstName + usrLastName;
         tvWelcome.setText(welcomeMessage);
 
         ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, option);
@@ -68,49 +107,37 @@ public class UserMainActivity extends AppCompatActivity implements OnItemSelecte
                 }
             }
         });
+        */
 
     }
 
     @Override
-    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.user_main_menu, menu);
+        return true;
+    }
 
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        /*
         // On selecting a spinner item
         String item = parent.getItemAtPosition(position).toString();
 
         // Showing selected spinner item
         Toast.makeText(parent.getContext(), "Selected: " + item, Toast.LENGTH_LONG).show();
-
+        */
     }
 
-    public void onNothingSelected(AdapterView<?> arg0) {
-        // TODO Auto-generated method stub
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+        //Toast.makeText(parent.getContext(), "NothingSelected", Toast.LENGTH_SHORT).show();
     }
 
-
-    private List<String> getFriendList(String usrAccount) {
-        final List<String> friendList = new ArrayList<String>();
-        Response.Listener<String> responseListener = new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-
-                System.out.println("Response:" + response);
-
-                try {
-                    JSONArray result = new JSONArray(response);
-                    for (int i = 0; i < result.length(); i++) {
-                        friendList.add(result.getJSONObject(i).getString("friendList"));
-                    }
-
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        };
-
-        GetFriendListRequest request = new GetFriendListRequest(usrAccount, responseListener);
-        RequestQueue requestQueue = Volley.newRequestQueue(UserMainActivity.this);
-        requestQueue.add(request);
-        return friendList;
+    @Override
+    public void onClick(View v) {
+        int i = v.getId();
+        //if(i == R.id.bSubmit) {
+        //}
     }
 
 }
