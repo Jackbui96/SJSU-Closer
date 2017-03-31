@@ -2,7 +2,6 @@ package com.apackage.nguye.sjsucloser;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.ActionMenuView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
@@ -10,9 +9,11 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -26,11 +27,12 @@ import com.google.firebase.database.ValueEventListener;
 public class UserMainActivity extends AppCompatActivity implements OnItemSelectedListener, View.OnClickListener {
 
     private static final String TAG = "UserMainActivity";
+    private static final String FRIENDTAG = "Add Friend";
 
     private Toolbar toolbar;
-    private ActionMenuView userMenu;
     private TextView tvWelcome;
     private TextView tvBasicInfo;
+    private EditText etSearchFriend;
     private Spinner spinner;
     private ListView listView;
     private Button bSubmit;
@@ -48,11 +50,27 @@ public class UserMainActivity extends AppCompatActivity implements OnItemSelecte
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setNavigationIcon(R.drawable.ic_menu_drop_down);
+        toolbar.setNavigationOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        int i = v.getId();
+                        if (i == R.id.action_add_friend) {
+                            Toast.makeText(UserMainActivity.this, "Add friend clicked",
+                                    Toast.LENGTH_SHORT).show();
+                            addFriend();
+                        }
+                    }
+                });
         setSupportActionBar(toolbar);
         //getSupportActionBar().setIcon(R.drawable.ic_menu_drop_down);
 
         tvWelcome = (TextView) findViewById(R.id.tvWelcome);
         tvBasicInfo = (TextView) findViewById(R.id.tvBasicInfo);
+        etSearchFriend = (EditText) findViewById(R.id.etSearchFriend);
+
+
+
         //spinner = (Spinner) findViewById(R.id.optionSpinner);
         //listView = (ListView) findViewById(R.id.lvFriendList);
         //bSubmit = (Button) findViewById(R.id.bSubmit);
@@ -111,6 +129,51 @@ public class UserMainActivity extends AppCompatActivity implements OnItemSelecte
 
     }
 
+    private void addFriend() {
+        final String friend = etSearchFriend.getText().toString();
+
+        Log.d(FRIENDTAG, "Adding friend");
+        /*
+        if (!validateForm(friend)) {
+            return;
+        }
+        */
+        //mFirebaseDatabase = FirebaseDatabase.getInstance().getReference().child("users").child(friend);
+        dbListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.child("account").getValue().equals(friend)) {
+                    Boolean test = true;
+                    if (test) {
+                        Toast.makeText(UserMainActivity.this, "Found",
+                                Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(UserMainActivity.this, "E rror",
+                                Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.w(TAG, "Failed to read value.", databaseError.toException());
+            }
+        };
+
+    }
+
+    /*
+    private boolean validateForm(String friend){
+        boolean valid = true;
+        if(TextUtils.isEmpty(friend)){
+            AlertDialog.Builder builder = new AlertDialog.Builder(UserMainActivity.this);
+            builder
+        }
+    }
+    */
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.user_main_menu, menu);
@@ -136,8 +199,6 @@ public class UserMainActivity extends AppCompatActivity implements OnItemSelecte
     @Override
     public void onClick(View v) {
         int i = v.getId();
-        //if(i == R.id.bSubmit) {
-        //}
     }
 
 }

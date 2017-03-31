@@ -1,3 +1,19 @@
-<menu>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".UserMainActivity">
+
+    <item
+        android:id="@+id/action_add_friend"
+        android:icon="@drawable/ic_person_add_black_24dp"
+        android:orderInCategory="100"
+        android:title="add_friend"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/action_message"
+        android:icon="@drawable/ic_message_black_24dp"
+        android:orderInCategory="200"
+        android:title="message"
+        app:showAsAction="ifRoom" />
 
 </menu>

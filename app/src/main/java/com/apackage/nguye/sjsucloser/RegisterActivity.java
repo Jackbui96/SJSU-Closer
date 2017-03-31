@@ -42,9 +42,9 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
+        etAccount = (EditText) findViewById(R.id.etAccount);
         etFirstName = (EditText) findViewById(R.id.etFirstName);
         etLastName = (EditText) findViewById(R.id.etLastName);
-        etAccount = (EditText) findViewById(R.id.etAccount);
         etPassword = (EditText) findViewById(R.id.etPassword);
         bRegister = (Button) findViewById(R.id.bRegister);
         progressDialog = new ProgressDialog(RegisterActivity.this);
@@ -52,6 +52,10 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         mFirebaseDatabase = FirebaseDatabase.getInstance().getReference();
         mAuth = FirebaseAuth.getInstance();
 
+        etAccount.setOnClickListener(this);
+        etFirstName.setOnClickListener(this);
+        etLastName.setOnClickListener(this);
+        etPassword.setOnClickListener(this);
         bRegister.setOnClickListener(this);
 
     }
@@ -127,6 +131,15 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         int i = v.getId();
         if (i == R.id.bRegister)
             register();
+        if (i == R.id.etAccount)
+            etAccount.setCursorVisible(true);
+        if (i == R.id.etFirstName)
+            etAccount.setCursorVisible(true);
+        if (i == R.id.etLastName)
+            etAccount.setCursorVisible(true);
+        if (i == R.id.etPassword)
+            etAccount.setCursorVisible(true);
     }
+
 
 }

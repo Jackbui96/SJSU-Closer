@@ -2,6 +2,7 @@ package com.apackage.nguye.sjsucloser;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
@@ -37,14 +38,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         setContentView(R.layout.activity_login);
-
-        /*
-        ConstraintLayout rl = (ConstraintLayout)findViewById(R.id.activity_login);
-        ImageView imageView = new ImageView(this);
-        imageView.setImageResource(R.drawable.sjsu_logo);
-        rl.addView(imageView);
-        */
 
         usrAccount = (EditText) findViewById(R.id.etUserAccount);
         usrPassword = (EditText) findViewById(R.id.etUserPassword);

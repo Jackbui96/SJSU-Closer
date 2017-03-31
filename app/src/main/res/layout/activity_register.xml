@@ -30,6 +30,7 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentStart="true"
         android:layout_below="@+id/tvLastName"
+        android:cursorVisible="false"
         android:ems="10"
         android:inputType="textPersonName" />
 
@@ -53,6 +54,7 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentStart="true"
         android:layout_below="@+id/tvAccount"
+        android:cursorVisible="false"
         android:ems="10"
         android:inputType="textEmailAddress" />
 
@@ -76,6 +78,7 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentStart="true"
         android:layout_below="@+id/tvFirstName"
+        android:cursorVisible="false"
         android:ems="10"
         android:inputType="textPersonName" />
 
@@ -99,6 +102,7 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentStart="true"
         android:layout_below="@+id/tvPassword"
+        android:cursorVisible="false"
         android:ems="10"
         android:inputType="textPassword" />
 
