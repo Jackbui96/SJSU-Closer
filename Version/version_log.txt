@@ -1,3 +1,4 @@
 ver 0.1: Done with Firebase authentication
 ver 0.2: Done with saving user's info into Firebase
-ver 0.3: Remodel UI to have more feel for the user
+ver 0.3: Remodel UI to make the user feel more comfortable
+ver 0.4(1): Searching for friend through Firebase is complete
