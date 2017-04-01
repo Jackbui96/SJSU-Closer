@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -120,7 +121,6 @@ public class UserMainActivity extends AppCompatActivity implements OnItemSelecte
 
     private void addFriend() {
         final String friend = etSearchFriend.getText().toString();
-        System.out.println("Friend: " + friend);
         Log.d(FRIENDTAG, "Adding friend");
         if (!validateForm(friend)) {
             return;
@@ -161,6 +161,13 @@ public class UserMainActivity extends AppCompatActivity implements OnItemSelecte
                     .create()
                     .show();
             valid = false;
+        } else if (TextUtils.isEmpty(friend)) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(UserMainActivity.this);
+            builder.setMessage("At least enter something if you want to add")
+                    .setNegativeButton("Retry", null)
+                    .create()
+                    .show();
+            valid = false;
         }
         return valid;
     }
@@ -177,7 +184,6 @@ public class UserMainActivity extends AppCompatActivity implements OnItemSelecte
         int i = item.getItemId();
         switch (i) {
             case R.id.action_add_friend:
-                Toast.makeText(this, "Add fiend", Toast.LENGTH_SHORT).show();
                 addFriend();
                 return true;
 
