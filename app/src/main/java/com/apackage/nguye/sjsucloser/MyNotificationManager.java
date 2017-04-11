@@ -29,9 +29,9 @@ public class MyNotificationManager {
         this.mCtx = mCtx;
     }
 
-    //the method will show a big notification with an image
+    //the method will show a big notification_layout with an image
     //parameters are title for message title, message for message text, url of the big image and an intent that will open
-    //when you will tap on the notification
+    //when you will tap on the notification_layout
     public void showBigNotification(String title, String message, String url, Intent intent) {
         PendingIntent resultPendingIntent =
                 PendingIntent.getActivity(
@@ -62,9 +62,9 @@ public class MyNotificationManager {
         notificationManager.notify(ID_BIG_NOTIFICATION, notification);
     }
 
-    //the method will show a small notification
+    //the method will show a small notification_layout
     //parameters are title for message title, message for message text and an intent that will open
-    //when you will tap on the notification
+    //when you will tap on the notification_layout
     public void showSmallNotification(String title, String message, Intent intent) {
         PendingIntent resultPendingIntent =
                 PendingIntent.getActivity(

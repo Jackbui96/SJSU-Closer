@@ -30,7 +30,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         }
     }
 
-    //this method will display the notification
+    //this method will display the notification_layout
     //We are passing the JSONObject that is received from
     //firebase cloud messaging
     private void sendPushNotification(JSONObject json) {
@@ -48,16 +48,16 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             //creating MyNotificationManager object
             MyNotificationManager mNotificationManager = new MyNotificationManager(getApplicationContext());
 
-            //creating an intent for the notification
+            //creating an intent for the notification_layout
             Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
 
             //if there is no image
             if (imageUrl.equals("null")) {
-                //displaying small notification
+                //displaying small notification_layout
                 mNotificationManager.showSmallNotification(title, message, intent);
             } else {
                 //if there is an image
-                //displaying a big notification
+                //displaying a big notification_layout
                 mNotificationManager.showBigNotification(title, message, imageUrl, intent);
             }
         } catch (JSONException e) {

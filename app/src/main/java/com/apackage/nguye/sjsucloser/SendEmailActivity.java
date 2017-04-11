@@ -54,7 +54,6 @@ public class SendEmailActivity extends AppCompatActivity {
                 RequestQueue requestQueue = Volley.newRequestQueue(SendEmailActivity.this);
                 requestQueue.add(sendingRequest);
 
-
             }
         });
     }

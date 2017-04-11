@@ -1,6 +1,10 @@
 package com.apackage.nguye.sjsucloser;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.TabLayout;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -34,9 +38,12 @@ public class UserMainActivity extends AppCompatActivity implements OnItemSelecte
     private static final String FRIENDTAG = "Add Friend";
 
     private Toolbar toolbar;
+    private ActionBar actionBar;
     private TextView tvWelcome;
     private TextView tvBasicInfo;
     private EditText etSearchFriend;
+    private DrawerLayout drawerLayout;
+    private TabLayout tabLayout;
     private Button bAddFriend;
     private Spinner spinner;
     private ListView listView;
@@ -56,11 +63,16 @@ public class UserMainActivity extends AppCompatActivity implements OnItemSelecte
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setNavigationIcon(R.drawable.ic_menu_drop_down);
         setSupportActionBar(toolbar);
+        actionBar = getSupportActionBar();
 
         tvWelcome = (TextView) findViewById(R.id.tvWelcome);
         tvBasicInfo = (TextView) findViewById(R.id.tvBasicInfo);
         etSearchFriend = (EditText) findViewById(R.id.etSearchFriend);
-
+        //tabLayout = (TabLayout) findViewById(R.id.tab_layout);
+        //tabLayout.addTab(tabLayout.newTab().setText("Friend List"));
+        //tabLayout.addTab(tabLayout.newTab().setText("Class View"));
+        //tabLayout.addTab(tabLayout.newTab().setText("Add Class"));
+        //tabLayout.addTab(tabLayout.newTab().setText("Chat View"));
         //spinner = (Spinner) findViewById(R.id.optionSpinner);
         //listView = (ListView) findViewById(R.id.lvFriendList);
         //bSubmit = (Button) findViewById(R.id.bSubmit);
@@ -132,11 +144,21 @@ public class UserMainActivity extends AppCompatActivity implements OnItemSelecte
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.hasChildren()) {
-                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                        Toast.makeText(UserMainActivity.this, "Friend found", Toast.LENGTH_SHORT).show();
-                        //System.out.println(snapshot.getKey());
-                        //System.out.println(snapshot.child("account").getValue(String.class));
-                    }
+
+                    Toast.makeText(UserMainActivity.this, "Friend found", Toast.LENGTH_SHORT).show();
+
+                    //UsrPOJO friend = dataSnapshot.getValue();
+
+
+                    //user.getUid();
+                    System.out.println("dataSnapshot: " + dataSnapshot.toString());
+                    System.out.println("dataSnapshot value: " + dataSnapshot.getValue().toString());
+                    System.out.println("dataSnapshot value: " + dataSnapshot.child("account").toString());
+
+                    //System.out.println("friend: " + friend.getId());
+
+                    //sendNotification(friend.getId());
+
                 } else {
                     Toast.makeText(UserMainActivity.this, "Friend not found", Toast.LENGTH_SHORT).show();
                     System.out.println("not found");
@@ -151,6 +173,10 @@ public class UserMainActivity extends AppCompatActivity implements OnItemSelecte
         });
     }
 
+    private void sendNotification(String id) {
+        FriendNotificationPOJO notificationPOJO = new FriendNotificationPOJO(user.getUid(), true, id, false);
+        mFirebaseDatabase.child("notification").child(id).setValue(notificationPOJO);
+    }
 
     private boolean validateForm(String friend){
         boolean valid = true;
@@ -186,7 +212,9 @@ public class UserMainActivity extends AppCompatActivity implements OnItemSelecte
             case R.id.action_add_friend:
                 addFriend();
                 return true;
-
+            case R.id.action_notification:
+                Intent notificationIntent = new Intent(UserMainActivity.this, NotificationActivity.class);
+                UserMainActivity.this.startActivity(notificationIntent);
             default:
                 // If we got here, the user's action was not recognized.
                 // Invoke the superclass to handle it.
