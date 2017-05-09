@@ -31,6 +31,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.HashMap;
+import java.util.Map;
+
 
 public class UserMainActivity extends AppCompatActivity implements OnItemSelectedListener, View.OnClickListener {
 
@@ -54,6 +57,8 @@ public class UserMainActivity extends AppCompatActivity implements OnItemSelecte
     private ValueEventListener dbListener;
     private String mUserKey;
 
+    private String friendAccount;
+    private String friendUid;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -147,17 +152,15 @@ public class UserMainActivity extends AppCompatActivity implements OnItemSelecte
 
                     Toast.makeText(UserMainActivity.this, "Friend found", Toast.LENGTH_SHORT).show();
 
-                    //UsrPOJO friend = dataSnapshot.getValue();
+                    for (DataSnapshot value : dataSnapshot.getChildren()) {
+                        friendAccount = value.child("account").getValue().toString();
+                        friendUid = value.child("id").getValue().toString();
 
-
-                    //user.getUid();
-                    System.out.println("dataSnapshot: " + dataSnapshot.toString());
-                    System.out.println("dataSnapshot value: " + dataSnapshot.getValue().toString());
-                    System.out.println("dataSnapshot value: " + dataSnapshot.child("account").toString());
-
-                    //System.out.println("friend: " + friend.getId());
-
-                    //sendNotification(friend.getId());
+                        Map<String, Boolean> friend = new HashMap<String, Boolean>();
+                        friend.put(friendUid, false);
+                        sendNotification(user.getEmail(), friendAccount);
+                        makeFriend(friend);
+                    }
 
                 } else {
                     Toast.makeText(UserMainActivity.this, "Friend not found", Toast.LENGTH_SHORT).show();
@@ -173,9 +176,25 @@ public class UserMainActivity extends AppCompatActivity implements OnItemSelecte
         });
     }
 
-    private void sendNotification(String id) {
-        FriendNotificationPOJO notificationPOJO = new FriendNotificationPOJO(user.getUid(), true, id, false);
-        mFirebaseDatabase.child("notification").child(id).setValue(notificationPOJO);
+    private void sendNotification(String userAccount, String friendAccount) {
+
+        FriendNotificationPOJO notificationPOJO = new FriendNotificationPOJO(userAccount, friendAccount, true);
+
+        //Redirecting path
+        mFirebaseDatabase = FirebaseDatabase.getInstance().getReference();
+
+        mFirebaseDatabase.child("notification").push().setValue(notificationPOJO);
+
+    }
+
+    private void makeFriend(Map<String, Boolean> friend) {
+
+        FriendStructPOJO friendStruct = new FriendStructPOJO(friend);
+
+        //Redirecting path
+        mFirebaseDatabase = FirebaseDatabase.getInstance().getReference();
+
+        mFirebaseDatabase.child("friend list").child(user.getUid()).push().setValue(friendStruct);
     }
 
     private boolean validateForm(String friend){
