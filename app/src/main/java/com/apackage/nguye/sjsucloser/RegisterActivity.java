@@ -141,5 +141,4 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
             etAccount.setCursorVisible(true);
     }
 
-
 }

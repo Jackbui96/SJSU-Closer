@@ -2,6 +2,7 @@ package com.apackage.nguye.sjsucloser;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.widget.Button;
 import android.widget.ListView;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -17,11 +18,15 @@ import java.util.ArrayList;
 
 public class NotificationActivity extends AppCompatActivity {
 
-    private String src;
-    private ArrayList<String> friendList;
+    private Button bAccept;
+    private Button bDecline;
 
     private FirebaseUser user;
     private DatabaseReference mFirebaseDatabase;
+
+    private String src;
+    private boolean notification;
+    private ArrayList<String> friendList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,15 +37,18 @@ public class NotificationActivity extends AppCompatActivity {
 
         friendList = new ArrayList<String>();
 
-        mFirebaseDatabase = FirebaseDatabase.getInstance().getReference().child("notification");
-        Query query = mFirebaseDatabase.orderByChild("dest").equalTo(user.getEmail());
+        mFirebaseDatabase = FirebaseDatabase.getInstance().getReference().child("notification list");
+        Query query = mFirebaseDatabase.orderByChild("dest").equalTo(user.getUid());
         query.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for (DataSnapshot value : dataSnapshot.getChildren()) {
-                    src = value.child("src").getValue().toString();
-                    System.out.println("src value: " + src);
-                    friendList.add(src + " wants to add you");
+                    notification = (boolean) value.child("notification").getValue();
+                    if (notification) {
+                        src = value.child("src").getValue().toString();
+                        System.out.println("src value: " + src);
+                        friendList.add(src);
+                    }
                 }
 
             }
@@ -56,4 +64,5 @@ public class NotificationActivity extends AppCompatActivity {
         ListView lv = (ListView) findViewById(R.id.lvNotification);
         lv.setAdapter(adapter);
     }
+
 }

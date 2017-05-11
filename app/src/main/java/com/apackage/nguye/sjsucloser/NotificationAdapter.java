@@ -1,3 +1,4 @@
+
 package com.apackage.nguye.sjsucloser;
 
 import android.content.Context;
@@ -9,6 +10,15 @@ import android.widget.Button;
 import android.widget.ListAdapter;
 import android.widget.TextView;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
+
 import java.util.ArrayList;
 
 /**
@@ -19,6 +29,10 @@ public class NotificationAdapter extends BaseAdapter implements ListAdapter {
 
     private ArrayList<String> list = new ArrayList<String>();
     private Context context;
+
+    private FirebaseUser user;
+    private String friendUid;
+    private DatabaseReference mFirebaseDatabase;
 
     public NotificationAdapter(ArrayList<String> list, Context context) {
         this.list = list;
@@ -51,7 +65,7 @@ public class NotificationAdapter extends BaseAdapter implements ListAdapter {
 
         //Handle TextView and display string from your list
         TextView listItemText = (TextView) view.findViewById(R.id.tvNotification);
-        listItemText.setText(list.get(position));
+        listItemText.setText(list.get(position) /*+ " wants to add you"*/);
 
         //Handle buttons and add onClickListeners
         Button bAccept = (Button) view.findViewById(R.id.bAccept);
@@ -60,18 +74,61 @@ public class NotificationAdapter extends BaseAdapter implements ListAdapter {
         bAccept.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                deleteNotification(position);
+                acceptFriend(position);
+                notifyDataSetChanged();
             }
         });
         bDecline.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                deleteNotification(position);
+                notifyDataSetChanged();
             }
         });
 
         return view;
     }
 
+    private void deleteNotification(int position) {
+        System.out.println("checking: " + list.get(position));
 
+        user = FirebaseAuth.getInstance().getCurrentUser();
+        mFirebaseDatabase = FirebaseDatabase.getInstance().getReference().child("notification list");
+        Query query = mFirebaseDatabase.orderByChild("src").equalTo(list.get(position));
+
+        query.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.hasChildren()) {
+                    DataSnapshot nodeDataSnapshot = dataSnapshot.getChildren().iterator().next();
+                    String key = nodeDataSnapshot.getKey();
+                    mFirebaseDatabase = FirebaseDatabase.getInstance().getReference();
+                    mFirebaseDatabase.child("notification list").child(key).child("notification").setValue(false);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                throw databaseError.toException();
+            }
+        });
+
+    }
+
+
+    private void acceptFriend(int position) {
+
+        user = FirebaseAuth.getInstance().getCurrentUser();
+        friendUid = list.get(position);
+
+        //Redirecting path
+        mFirebaseDatabase = FirebaseDatabase.getInstance().getReference();
+        mFirebaseDatabase.child("friend list").child(user.getUid()).child(friendUid).setValue(true);
+
+        //Redirecting path
+        mFirebaseDatabase = FirebaseDatabase.getInstance().getReference();
+        mFirebaseDatabase.child("friend list").child(friendUid).child(user.getUid()).setValue(true);
+
+    }
 }

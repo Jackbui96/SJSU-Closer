@@ -15,6 +15,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -31,9 +32,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import java.util.ArrayList;
 
 public class UserMainActivity extends AppCompatActivity implements OnItemSelectedListener, View.OnClickListener {
 
@@ -45,6 +44,11 @@ public class UserMainActivity extends AppCompatActivity implements OnItemSelecte
     private TextView tvWelcome;
     private TextView tvBasicInfo;
     private EditText etSearchFriend;
+    private ArrayList<String> friendList;
+    private ListView lvFriendList;
+    private Button bAddClass;
+    private Button bClassList;
+    private Button bMatchClass;
     private DrawerLayout drawerLayout;
     private TabLayout tabLayout;
     private Button bAddFriend;
@@ -73,6 +77,16 @@ public class UserMainActivity extends AppCompatActivity implements OnItemSelecte
         tvWelcome = (TextView) findViewById(R.id.tvWelcome);
         tvBasicInfo = (TextView) findViewById(R.id.tvBasicInfo);
         etSearchFriend = (EditText) findViewById(R.id.etSearchFriend);
+        bAddClass = (Button) findViewById(R.id.bAddClass);
+        bClassList = (Button) findViewById(R.id.bClassList);
+        bMatchClass = (Button) findViewById(R.id.bMatchClass);
+
+        lvFriendList = (ListView) findViewById(R.id.lvFriendList);
+
+        bAddClass.setOnClickListener(this);
+        bClassList.setOnClickListener(this);
+        bMatchClass.setOnClickListener(this);
+
         //tabLayout = (TabLayout) findViewById(R.id.tab_layout);
         //tabLayout.addTab(tabLayout.newTab().setText("Friend List"));
         //tabLayout.addTab(tabLayout.newTab().setText("Class View"));
@@ -104,6 +118,8 @@ public class UserMainActivity extends AppCompatActivity implements OnItemSelecte
             }
         };
         mFirebaseDatabase.addValueEventListener(dbListener);
+
+        getFriendList();
 
         /*
         spinner.setOnItemSelectedListener(this);
@@ -156,10 +172,8 @@ public class UserMainActivity extends AppCompatActivity implements OnItemSelecte
                         friendAccount = value.child("account").getValue().toString();
                         friendUid = value.child("id").getValue().toString();
 
-                        Map<String, Boolean> friend = new HashMap<String, Boolean>();
-                        friend.put(friendUid, false);
-                        sendNotification(user.getEmail(), friendAccount);
-                        makeFriend(friend);
+                        sendNotification(user.getUid(), friendUid);
+                        makeFriend(friendUid);
                     }
 
                 } else {
@@ -183,18 +197,72 @@ public class UserMainActivity extends AppCompatActivity implements OnItemSelecte
         //Redirecting path
         mFirebaseDatabase = FirebaseDatabase.getInstance().getReference();
 
-        mFirebaseDatabase.child("notification").push().setValue(notificationPOJO);
+        mFirebaseDatabase.child("notification list").push().setValue(notificationPOJO);
 
     }
 
-    private void makeFriend(Map<String, Boolean> friend) {
-
-        FriendStructPOJO friendStruct = new FriendStructPOJO(friend);
+    private void makeFriend(String friendUid) {
 
         //Redirecting path
         mFirebaseDatabase = FirebaseDatabase.getInstance().getReference();
+        mFirebaseDatabase.child("friend list").child(user.getUid()).child(friendUid).setValue(false);
 
-        mFirebaseDatabase.child("friend list").child(user.getUid()).push().setValue(friendStruct);
+        //Redirecting path
+        mFirebaseDatabase = FirebaseDatabase.getInstance().getReference();
+        mFirebaseDatabase.child("friend list").child(friendUid).child(user.getUid()).setValue(false);
+    }
+
+    private void getFriendList() {
+
+
+        friendList = new ArrayList<String>();
+        mFirebaseDatabase = FirebaseDatabase.getInstance().getReference().child("friend list").child(user.getUid());
+        mFirebaseDatabase.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot value : dataSnapshot.getChildren()) {
+                    if ((boolean) value.getValue(true)) {
+                        friendList.add(value.getKey().toString());
+                    }
+                    System.out.println("friendList arraylist: " + friendList);
+                    System.out.println("Datasnapshot getkey: " + value.getKey());
+                    System.out.println("Datasnapshot getvalue(true): " + value.getValue(true));
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
+                android.R.layout.simple_list_item_1, android.R.id.text1, friendList);
+        lvFriendList.setAdapter(adapter);
+        adapter.notifyDataSetChanged();
+
+        // ListView Item Click Listener
+        lvFriendList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view,
+                                    int position, long id) {
+
+                // ListView Clicked item index
+                int itemPosition = position;
+
+                // ListView Clicked item value
+                String itemValue = (String) lvFriendList.getItemAtPosition(position);
+
+                // Show Alert
+                Toast.makeText(getApplicationContext(),
+                        "Position :" + itemPosition + "  ListItem : " + itemValue, Toast.LENGTH_LONG)
+                        .show();
+
+            }
+
+        });
+
+
     }
 
     private boolean validateForm(String friend){
@@ -261,7 +329,18 @@ public class UserMainActivity extends AppCompatActivity implements OnItemSelecte
 
     @Override
     public void onClick(View v) {
+
+        /*
         int i = v.getId();
+        if (i == R.id.bFriendList)
+            register();
+        if (i == R.id.bAddClass)
+            register();
+        if (i == R.id.bClassList)
+            register();
+        if (i == R.id.bMatchClass)
+            register();
+            */
     }
 
 }
