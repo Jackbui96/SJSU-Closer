@@ -48,7 +48,8 @@
         <activity android:name=".AddFriendActivity" />
         <activity android:name=".AddClassActivity" />
         <activity android:name=".SendEmailActivity" />
-        <activity android:name=".NotificationActivity"></activity>
+        <activity android:name=".NotificationActivity" />
+        <activity android:name=".ClassListActivity"></activity>
     </application>
 
 </manifest>

@@ -15,36 +15,34 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
-public class NotificationActivity extends AppCompatActivity {
+public class ClassListActivity extends AppCompatActivity {
 
-    private FirebaseUser user;
+    private FirebaseUser mUser;
     private DatabaseReference mFirebaseDatabase;
+    private Query query;
 
-    private String src;
-    private boolean notification;
-    private ArrayList<String> friendList;
+    private ArrayList<String> classList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_notification);
+        setContentView(R.layout.activity_class_list);
 
-        friendList = new ArrayList<String>();
+        classList = new ArrayList<String>();
 
-        user = FirebaseAuth.getInstance().getCurrentUser();
-        mFirebaseDatabase = FirebaseDatabase.getInstance().getReference().child("notification list");
+        mUser = FirebaseAuth.getInstance().getCurrentUser();
+        mFirebaseDatabase = FirebaseDatabase.getInstance().getReference().child("class list");
 
-        Query query = mFirebaseDatabase.orderByChild("dest").equalTo(user.getUid());
+        query = mFirebaseDatabase.orderByChild(mUser.getUid());
+
         query.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for (DataSnapshot value : dataSnapshot.getChildren()) {
-                    notification = (boolean) value.child("notification").getValue();
-                    if (notification) {
-                        src = value.child("src").getValue().toString();
-                        System.out.println("src value: " + src);
-                        friendList.add(src);
-                    }
+                    DataSnapshot nodeDataSnapshot = dataSnapshot.getChildren().iterator().next();
+                    String key = nodeDataSnapshot.getKey();
+                    System.out.println("Checking for list: " + key);
+                    classList.add(key);
                 }
 
             }
@@ -55,10 +53,9 @@ public class NotificationActivity extends AppCompatActivity {
             }
         });
 
-        NotificationAdapter adapter = new NotificationAdapter(friendList, this);
+        ClassListAdapter adapter = new ClassListAdapter(classList, this);
 
-        ListView lv = (ListView) findViewById(R.id.lvNotification);
+        ListView lv = (ListView) findViewById(R.id.lvClassList);
         lv.setAdapter(adapter);
     }
-
 }

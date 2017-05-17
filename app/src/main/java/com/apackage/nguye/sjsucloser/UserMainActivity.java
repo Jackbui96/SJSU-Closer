@@ -61,6 +61,7 @@ public class UserMainActivity extends AppCompatActivity implements OnItemSelecte
     private ValueEventListener dbListener;
     private String mUserKey;
 
+    private String friend;
     private String friendAccount;
     private String friendUid;
 
@@ -153,7 +154,8 @@ public class UserMainActivity extends AppCompatActivity implements OnItemSelecte
     }
 
     private void addFriend() {
-        final String friend = etSearchFriend.getText().toString();
+
+        friend = etSearchFriend.getText().toString();
         Log.d(FRIENDTAG, "Adding friend");
         if (!validateForm(friend)) {
             return;
@@ -214,7 +216,6 @@ public class UserMainActivity extends AppCompatActivity implements OnItemSelecte
 
     private void getFriendList() {
 
-
         friendList = new ArrayList<String>();
         mFirebaseDatabase = FirebaseDatabase.getInstance().getReference().child("friend list").child(user.getUid());
         mFirebaseDatabase.addValueEventListener(new ValueEventListener() {
@@ -269,7 +270,7 @@ public class UserMainActivity extends AppCompatActivity implements OnItemSelecte
         boolean valid = true;
         if (friend.equals(user.getEmail())) {
             AlertDialog.Builder builder = new AlertDialog.Builder(UserMainActivity.this);
-            builder.setMessage("You can't add yourself, you sick fuck")
+            builder.setMessage("You can't add yourself")
                     .setNegativeButton("Retry", null)
                     .create()
                     .show();
@@ -311,6 +312,20 @@ public class UserMainActivity extends AppCompatActivity implements OnItemSelecte
 
     }
 
+    private void addClass() {
+        Intent addClassIntent = new Intent(UserMainActivity.this, AddClassActivity.class);
+        startActivity(addClassIntent);
+    }
+
+    private void classList() {
+        Intent classListIntent = new Intent(UserMainActivity.this, ClassListActivity.class);
+        startActivity(classListIntent);
+    }
+
+    private void matchClass() {
+
+    }
+
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
         /*
@@ -329,18 +344,13 @@ public class UserMainActivity extends AppCompatActivity implements OnItemSelecte
 
     @Override
     public void onClick(View v) {
-
-        /*
         int i = v.getId();
-        if (i == R.id.bFriendList)
-            register();
         if (i == R.id.bAddClass)
-            register();
+            addClass();
         if (i == R.id.bClassList)
-            register();
+            classList();
         if (i == R.id.bMatchClass)
-            register();
-            */
+            matchClass();
     }
 
 }

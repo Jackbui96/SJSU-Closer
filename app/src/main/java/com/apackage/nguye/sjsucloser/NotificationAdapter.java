@@ -101,10 +101,12 @@ public class NotificationAdapter extends BaseAdapter implements ListAdapter {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.hasChildren()) {
+
                     DataSnapshot nodeDataSnapshot = dataSnapshot.getChildren().iterator().next();
                     String key = nodeDataSnapshot.getKey();
                     mFirebaseDatabase = FirebaseDatabase.getInstance().getReference();
                     mFirebaseDatabase.child("notification list").child(key).child("notification").setValue(false);
+                    //System.out.println("checking for ref: " + mFirebaseDatabase.child("notification list").child(key).child("notification").getRef());
                 }
             }
 
